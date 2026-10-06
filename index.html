@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee ID Photo Capture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213d;--ink2:#243659;--paper:#f3f5f9;--card:#fff;--line:#dde3ee;--amber:#f2a900;--teal:#14937f;--red:#d64545;--muted:#66728a}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+header{background:var(--ink);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:4px solid var(--amber)}
+.logo{width:46px;height:46px;border-radius:10px;background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}
+.logo img{width:100%;height:100%;object-fit:contain}
+.logo b{display:none;font-size:22px;color:var(--ink);font-weight:800}
+header h1{font-size:18px;font-weight:800;line-height:1.2}
+header p{font-size:13px;color:#b9c4dc}
+.prog{margin-left:auto;text-align:right;font-size:13px;color:#b9c4dc;min-width:130px}
+.prog strong{color:#fff;font-size:18px}
+.bar{height:6px;background:var(--ink2);border-radius:9px;margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--amber);transition:width .5s}
+main{max-width:980px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{font-size:16px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.step+.step{margin-top:26px}
+.combo{position:relative}
+.combo input{width:100%;padding:14px 16px;font:inherit;border:2px solid var(--line);border-radius:12px;outline:none;background:#fafbfd}
+.combo input:focus{border-color:var(--amber);background:#fff}
+.list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px #14213d26;max-height:260px;overflow:auto;z-index:5;display:none;list-style:none;padding:6px}
+.list.open{display:block}
+.list li{padding:10px 12px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.list li.act,.list li:hover{background:#fff4d6}
+.list li small{color:var(--muted)}
+.list li .ok{color:var(--teal);font-weight:700;font-size:12px}
+.list .none{color:var(--muted);cursor:default}
+.note{margin-top:10px;font-size:13px;padding:9px 12px;border-radius:10px;background:#fff4d6;display:none}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:14px;font-weight:700;transition:transform .12s,opacity .2s}
+button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.alt{background:#fff;border:2px solid var(--ink);color:var(--ink)}
+.alt:hover{background:var(--ink);color:#fff}
+.save{width:100%;background:var(--amber);color:var(--ink);font-size:16px;padding:16px;margin-top:6px}
+.save:disabled{opacity:.4;cursor:not-allowed}
+.retake{margin-top:12px;background:none;color:var(--muted);text-decoration:underline;padding:4px;display:none}
+.idwrap{position:sticky;top:16px}
+.id{width:100%;background:var(--card);border-radius:18px;border:1px solid var(--line);overflow:hidden;box-shadow:0 18px 40px #14213d22;text-align:center}
+.id .top{background:var(--ink);padding:26px 0 14px;position:relative}
+.id .top:before{content:"";position:absolute;top:9px;left:50%;width:56px;height:9px;margin-left:-28px;border-radius:9px;background:var(--paper)}
+.id .top .logo{margin:0 auto 6px;width:40px;height:40px}
+.id .top span{color:#fff;font-weight:700;font-size:13px}
+.photo{width:150px;height:200px;margin:-8px auto 0;border-radius:10px;border:4px solid #fff;background:#e7ebf3 center/cover;box-shadow:0 6px 18px #14213d33;display:grid;place-items:center;color:var(--muted);font-size:13px;position:relative;top:8px}
+.id .info{padding:22px 16px 20px}
+.id .nm{font-size:20px;font-weight:800;min-height:28px}
+.id .cd{display:inline-block;margin-top:8px;background:var(--amber);color:var(--ink);font-weight:800;padding:4px 14px;border-radius:99px;letter-spacing:.5px}
+.id .st{height:8px;background:repeating-linear-gradient(90deg,var(--ink) 0 6px,transparent 6px 10px);opacity:.15}
+.cam{position:fixed;inset:0;background:#0b1428f2;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px}
+.cam.open{display:flex}
+.vf{position:relative;width:min(88vw,330px);aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:#000}
+.vf video{width:100%;height:100%;object-fit:cover}
+.vf:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 36% 30% at 50% 40%,transparent 98%,#0008 100%);pointer-events:none;border:3px solid var(--amber);border-radius:16px}
+.cam p{color:#fff;font-size:14px}
+.shutter{width:72px;height:72px;border-radius:50%;background:#fff;border:6px solid var(--amber);padding:0}
+.crow{display:flex;align-items:center;gap:26px}
+.crow .alt{background:transparent;color:#fff;border-color:#fff;padding:10px 14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;transition:transform .35s;z-index:30;max-width:90vw}
+.toast.show{transform:translate(-50%,0)}
+.toast.good{background:var(--teal)}.toast.bad{background:var(--red)}
+.spin{display:inline-block;width:16px;height:16px;border:3px solid #14213d55;border-top-color:var(--ink);border-radius:50%;animation:r .8s linear infinite;vertical-align:-3px;margin-right:8px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media(max-width:820px){main{grid-template-columns:1fr}.idwrap{position:static;order:-1}.prog{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><img src="logo.png" alt="Company logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><b>S</b></div>
+  <div><h1>Employee ID Card Photos</h1><p>Capture, check and save in one go</p></div>
+  <div class="prog"><strong id="pc">0</strong> / <span id="pt">0</span> done<div class="bar"><i id="pb"></i></div></div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="step">
+      <h2>1. Find the employee</h2>
+      <p class="sub">Type a name or employee code.</p>
+      <div class="combo">
+        <input id="q" type="text" placeholder="Search employee..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="lst">
+        <ul class="list" id="lst" role="listbox"></ul>
+      </div>
+      <div class="note" id="note">This employee already has a photo. Saving will replace it.</div>
+    </div>
+    <div class="step">
+      <h2>2. Add a passport-size photo</h2>
+      <p class="sub">Face straight to the camera, plain background, no cap or glasses glare.</p>
+      <div class="btns">
+        <button class="alt" id="bCam">Take photo</button>
+        <button class="alt" id="bGal">Choose from gallery</button>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <button class="retake" id="bRe">Remove photo</button>
+    </div>
+    <div class="step">
+      <button class="save" id="bSave" disabled>Save photo</button>
+    </div>
+  </section>
+
+  <aside class="idwrap">
+    <div class="id">
+      <div class="top"><div class="logo"><img src="logo.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><b>S</b></div><span>EMPLOYEE ID</span></div>
+      <div class="photo" id="pv">No photo yet</div>
+      <div class="info"><div class="nm" id="pn">Select an employee</div><span class="cd" id="pcode">- - -</span></div>
+      <div class="st"></div>
+    </div>
+  </aside>
+</main>
+
+<div class="cam" id="cam">
+  <div class="vf"><video id="vid" playsinline muted></video></div>
+  <p>Fit the face inside the frame</p>
+  <div class="crow">
+    <button class="alt" id="cClose">Cancel</button>
+    <button class="shutter" id="cShot" aria-label="Capture photo"></button>
+    <button class="alt" id="cFlip">Flip</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 1) Paste your deployed Apps Script Web App URL here
+const API_URL = 'https://script.google.com/macros/s/AKfycbyIkUcDXsGbdjoXFALBViQCNi6bJW9lyBahYDm3xTvh-5iRtgVTXKxpB5gmBFSrMAFu/exec';
+// Used only if API_URL is not set yet (demo mode)
+const DEMO = [{code:'SUSIIF00004',name:'KRISHNAN T'},{code:'SUSIIF00017',name:'ELUMALAI S'},{code:'SUSIIF00027',name:'R TAMIZHVANAN'}];
+
+const $ = id => document.getElementById(id);
+let emps = [], done = {}, sel = null, photo = null, stream = null, facing = 'user', idx = -1, shown = [];
+
+async function load(){
+  if(API_URL.startsWith('PASTE')){ emps = DEMO; toast('Demo mode: set API_URL to save for real'); }
+  else{
+    try{
+      const r = await (await fetch(API_URL)).json();
+      if(!r.ok) throw new Error(r.error);
+      emps = r.employees; done = r.done || {};
+    }catch(e){ toast('Could not load employees. Check your connection and refresh.','bad'); }
+  }
+  progress();
+}
+function progress(){
+  const n = emps.filter(e => done[e.code]).length;
+  $('pc').textContent = n; $('pt').textContent = emps.length;
+  $('pb').style.width = emps.length ? (n/emps.length*100)+'%' : '0';
+}
+
+// ---- searchable dropdown ----
+function render(){
+  const t = $('q').value.trim().toLowerCase();
+  shown = emps.filter(e => (e.code+' '+e.name).toLowerCase().includes(t)).slice(0,50);
+  idx = shown.length ? 0 : -1;
+  $('lst').innerHTML = shown.length ? shown.map((e,i)=>
+    `<li role="option" data-i="${i}" class="${i===0?'act':''}"><span>${e.name}<br><small>${e.code}</small></span>${done[e.code]?'<span class="ok">Photo added</span>':''}</li>`).join('')
+    : '<li class="none">No employee found</li>';
+  $('lst').classList.add('open'); $('q').setAttribute('aria-expanded','true');
+}
+function closeList(){ $('lst').classList.remove('open'); $('q').setAttribute('aria-expanded','false'); }
+function pick(e){
+  sel = e; $('q').value = e.name+' ('+e.code+')'; closeList();
+  $('pn').textContent = e.name; $('pcode').textContent = e.code;
+  $('note').style.display = done[e.code] ? 'block' : 'none';
+  check();
+}
+$('q').addEventListener('focus', () => { $('q').select(); render(); });
+$('q').addEventListener('input', () => { sel = null; $('pn').textContent='Select an employee'; $('pcode').textContent='- - -'; $('note').style.display='none'; render(); check(); });
+$('q').addEventListener('keydown', ev => {
+  const items = [...$('lst').querySelectorAll('li:not(.none)')];
+  if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){
+    ev.preventDefault(); if(!items.length) return;
+    idx = (idx + (ev.key==='ArrowDown'?1:-1) + items.length) % items.length;
+    items.forEach((li,i)=>li.classList.toggle('act',i===idx)); items[idx].scrollIntoView({block:'nearest'});
+  }else if(ev.key==='Enter'&&shown[idx]){ ev.preventDefault(); pick(shown[idx]); }
+  else if(ev.key==='Escape') closeList();
+});
+$('lst').addEventListener('mousedown', ev => { const li = ev.target.closest('li[data-i]'); if(li) pick(shown[li.dataset.i]); });
+document.addEventListener('click', ev => { if(!ev.target.closest('.combo')) closeList(); });
+
+// ---- photo handling: centre-crop to 3:4, 600x800 JPEG ----
+function toPassport(src, w, h){
+  const c = document.createElement('canvas'); c.width = 600; c.height = 800;
+  const r = 3/4; let sw = w, sh = h;
+  if(w/h > r) sw = h*r; else sh = w/r;
+  c.getContext('2d').drawImage(src, (w-sw)/2, (h-sh)/2, sw, sh, 0, 0, 600, 800);
+  return c.toDataURL('image/jpeg', 0.85);
+}
+function setPhoto(d){
+  photo = d;
+  $('pv').style.backgroundImage = d ? `url(${d})` : '';
+  $('pv').textContent = d ? '' : 'No photo yet';
+  $('bRe').style.display = d ? 'inline' : 'none';
+  check();
+}
+$('bGal').onclick = () => $('file').click();
+$('file').onchange = ev => {
+  const f = ev.target.files[0]; if(!f) return;
+  const img = new Image();
+  img.onload = () => { setPhoto(toPassport(img, img.naturalWidth, img.naturalHeight)); URL.revokeObjectURL(img.src); };
+  img.onerror = () => toast('That file is not a readable image.','bad');
+  img.src = URL.createObjectURL(f); ev.target.value = '';
+};
+$('bRe').onclick = () => setPhoto(null);
+
+async function openCam(){
+  try{
+    stopCam();
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:1280}},audio:false});
+    $('vid').srcObject = stream; await $('vid').play(); $('cam').classList.add('open');
+    $('vid').style.transform = facing==='user' ? 'scaleX(-1)' : 'none';
+  }catch(e){ toast('Camera blocked. Allow camera access, or choose from gallery.','bad'); }
+}
+function stopCam(){ if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
+$('bCam').onclick = openCam;
+$('cClose').onclick = () => { stopCam(); $('cam').classList.remove('open'); };
+$('cFlip').onclick = () => { facing = facing==='user' ? 'environment' : 'user'; openCam(); };
+$('cShot').onclick = () => {
+  const v = $('vid'); setPhoto(toPassport(v, v.videoWidth, v.videoHeight));
+  stopCam(); $('cam').classList.remove('open');
+};
+
+// ---- save ----
+function check(){ $('bSave').disabled = !(sel && photo); }
+$('bSave').onclick = async () => {
+  if(!sel || !photo) return;
+  const b = $('bSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span>Saving...';
+  try{
+    if(API_URL.startsWith('PASTE')) throw new Error('Set API_URL in index.html first');
+    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({code:sel.code, name:sel.name, image:photo})});
+    const r = await res.json();
+    if(!r.ok) throw new Error(r.error);
+    done[sel.code] = r.url; progress();
+    toast('Saved photo for '+sel.name,'good');
+    sel = null; $('q').value=''; $('pn').textContent='Select an employee'; $('pcode').textContent='- - -';
+    $('note').style.display='none'; setPhoto(null); $('q').focus();
+  }catch(e){ toast('Not saved: '+e.message,'bad'); }
+  b.textContent = 'Save photo'; check();
+};
+
+let tt;
+function toast(m, k=''){ const t=$('toast'); t.textContent=m; t.className='toast show '+k; clearTimeout(tt); tt=setTimeout(()=>t.className='toast',3500); }
+load();
+</script>
+</body>
+</html>
